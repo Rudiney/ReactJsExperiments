@@ -9,3 +9,9 @@
 .aula.presente { background-color: green; }
 .aula.falta { background-color: red; }
 .aula.falta-justificada { background-color: orange; }
+
+.dia {
+	display: inline-block;
+	width: 14%;
+	vertical-align: top;
+}

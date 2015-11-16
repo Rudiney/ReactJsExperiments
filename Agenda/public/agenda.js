@@ -1,24 +1,3 @@
-var AULAS = {
-  "15/11/2015": {
-    11: [
-      {"aluno":"Rudi", "day":"15/11/2015", "hour":11, "id":1, "presence":"presente"},
-      {"aluno":"Manu", "day":"15/11/2015", "hour":11, "id":2, "presence":"falta"}
-    ],
-    12: [
-      {"aluno":"Juca", "day":"15/11/2015", "hour":12, "id":3, "presence":"falta-justificada"},
-      {"aluno":"Jessica", "day":"15/11/2015", "hour":12, "id":4, "presence":"presente"}
-    ]
-  },
-  "16/11/2015": {
-    6: [
-      {"aluno":"Paulo", "day":"16/11/2015", "hour":6, "id":5, "presence":"falta"},
-    ],
-    7: [
-      {"aluno":"José", "day":"16/11/2015", "hour":7, "id":6, "presence":"falta-justificada"}
-    ]
-  }
-};
-
 var Aula = React.createClass({
   showPath: function() { 
     return "/aula/" + this.props.id; 
@@ -47,7 +26,7 @@ var Horario = React.createClass({
   render: function() {
     return (
       <div className="horario">
-        <h3>{this.props.hour}:00</h3>
+        <b>{this.props.hour}:00</b>
         {this.renderMyClasses()}
       </div>
     );
@@ -71,7 +50,7 @@ var Dia = React.createClass({
   render: function() {
     return (
       <div className="dia">
-        <h2>{this.props.day}</h2>
+        <h3>{this.props.day}</h3>
         {this.renderHours()}
       </div>
     );
@@ -79,18 +58,52 @@ var Dia = React.createClass({
 });
 
 var Agenda = React.createClass({
+  weekDays: [
+    "10/11/2015",
+    "11/11/2015",
+    "12/11/2015",
+    "13/11/2015",
+    "14/11/2015",
+    "15/11/2015",
+    "16/11/2015"
+  ],
+
+  getInitialState: function() {
+    return {classes: {}};
+  },
+
+  renderDays: function() {
+    return this.weekDays.map(function(day) {
+      return ( <Dia key={day} day={day} classes={this.state.classes[day] || {}} /> );
+    }.bind(this));
+  },
+
+  refresh: function() {
+    $.ajax({
+      url: 'aulas.json',
+      dataType: 'json',
+      cache: false,
+      success: function(aulas) {
+        this.setState({classes: aulas});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
+
   render: function() {
     return (
       <div className='agenda'>
       <h1>Agenda</h1>
-        <Dia day="15/11/2015" classes={this.props.classes["15/11/2015"]} />
-        <Dia day="16/11/2015" classes={this.props.classes["16/11/2015"]} />
+      <a href='#' onClick={this.refresh}>Refresh</a>
+      <div>{this.renderDays()}</div>
       </div>
     );
   }
 });
 
 ReactDOM.render(
-  <Agenda classes={AULAS} />,
+  <Agenda/>,
   document.getElementById('agenda')
 );
